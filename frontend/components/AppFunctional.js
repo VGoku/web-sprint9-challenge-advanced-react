@@ -85,20 +85,22 @@ import axios from 'axios';
 const initialIndex = 4; // The starting index (center of the grid)
 const initialSteps = 0;
 
-const AppFunctional = () => {
-  const [index, setIndex] = useState(initialIndex);
-  const [steps, setSteps] = useState(initialSteps);
-  const [message, setMessage] = useState('');
-  const [email, setEmail] = useState('');
+const AppFunctional = (props) => {
+  const [index, setIndex] = useState(initialIndex);// State to manage current index position
+  const [steps, setSteps] = useState(initialSteps);// State to track the number of steps taken
+  const [message, setMessage] = useState('');// State to manage messages shown to the user
+  const [email, setEmail] = useState(''); // State to store email input
 
+  // Function to calculate and return coordinates based on index
   const getCoordinates = (index) => {
     const x = (index % 3) + 1;
     const y = Math.floor(index / 3) + 1;
     return `(${x},${y})`;
   };
-
+  // Function to move the position on the grid based on direction input
   const move = (direction) => {
-    setMessage('');
+    setMessage('');// Clear any previous messages
+    // Check boundaries and update index and steps accordingly
     if (direction === 'up' && index > 2) {
       setIndex(index - 3);
       setSteps(steps + 1);
@@ -112,35 +114,38 @@ const AppFunctional = () => {
       setIndex(index + 1);
       setSteps(steps + 1);
     } else {
-      setMessage(`You can't go ${direction}`);
+      setMessage(`You can't go ${direction}`);// If movement is not possible, display a message
     }
   };
 
+
+  // Function to reset the state values to initial state
   const reset = () => {
     setIndex(initialIndex);
     setSteps(initialSteps);
     setMessage('');
     setEmail('');
   };
-
+  // Function to handle form submission
   const handleSubmit = (evt) => {
     evt.preventDefault();
     const x = (index % 3) + 1;
     const y = Math.floor(index / 3) + 1;
     const payload = { x, y, steps, email };
-
+    // Send a POST request with payload to a local API endpoint
     axios.post('http://localhost:9000/api/result', payload)
       .then(response => {
-        setMessage(response.data.message);
-        setEmail('');
+        setMessage(response.data.message);// Update message state with API response message
+        setEmail('');// Clear email state
       })
       .catch(error => {
-        setMessage(error.response.data.message);
+        setMessage(error.response.data.message);// Update message state with error message
       });
   };
-
+  // JSX structure is assumed to follow, possibly rendering components and handling UI interactions
   return (
-    <div id="wrapper">
+    // <div id="wrapper">
+    <div id="wrapper" className={props.className}>
       <div className="info">
         <h3 id="coordinates">Coordinates {getCoordinates(index)}</h3>
         <h3 id="steps">You moved {steps} {steps === 1 ? 'time' : 'times'}</h3>
